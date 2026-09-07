@@ -9,6 +9,7 @@ interface CapturedCardProps {
   onRelease: (id: number) => void;
   mode?: 'grid' | 'list';
   isNew?: boolean;
+  onClick?: () => void;
 }
 
 export const CapturedCard: React.FC<CapturedCardProps> = ({
@@ -16,6 +17,7 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
   onRelease,
   mode = 'list',
   isNew = false,
+  onClick,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { showConfirmToast, showCapturedToast } = useToast();
@@ -34,6 +36,72 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
       },
     });
   };
+
+  const gridBodyContent = (
+    <>
+      <div className="relative w-24 h-24 flex items-center justify-center">
+        <img
+          src={captured.sprite}
+          alt={captured.name}
+          onLoad={() => setImageLoaded(true)}
+          className={`w-24 h-24 object-contain transition-transform group-hover:scale-105 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onError={(e) => {
+            if (captured.artwork) {
+              (e.target as HTMLImageElement).src = captured.artwork;
+            }
+          }}
+        />
+      </div>
+      <h3 className="capitalize font-bold text-slate-900 dark:text-white text-base">
+        {captured.name}
+      </h3>
+    </>
+  );
+
+  const listBodyContent = (
+    <>
+      <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center justify-center p-1 flex-shrink-0 border border-slate-200 dark:border-slate-800">
+        <img
+          src={captured.sprite}
+          alt={captured.name}
+          onLoad={() => setImageLoaded(true)}
+          className={`w-14 h-14 object-contain transition-transform group-hover:scale-110 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onError={(e) => {
+            if (captured.artwork) {
+              (e.target as HTMLImageElement).src = captured.artwork;
+            }
+          }}
+        />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center space-x-2">
+          <h3 className="capitalize font-extrabold text-slate-900 dark:text-white text-base sm:text-lg">
+            {captured.name}
+          </h3>
+          <span className="text-xs font-mono font-semibold text-slate-400">
+            {formattedId}
+          </span>
+          {isNew && (
+            <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide rounded-full bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-300 dark:ring-emerald-700 animate-pulse">
+              NEW
+            </span>
+          )}
+        </div>
+        <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+          <span className="font-semibold text-slate-500 dark:text-slate-400">Nickname:</span>{' '}
+          <span className="font-medium text-red-600 dark:text-red-400">{captured.nickname || 'None'}</span>
+        </p>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <span className="font-semibold">Date:</span> {captured.date}
+        </p>
+      </div>
+    </>
+  );
 
   if (mode === 'grid') {
     return (
@@ -67,27 +135,27 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
           </button>
         </div>
 
-        {/* Clickable body navigating to detail */}
-        <Link to={`/pokemon/${captured.id}`} className="flex flex-col items-center my-2">
-          <div className="relative w-24 h-24 flex items-center justify-center">
-            <img
-              src={captured.sprite}
-              alt={captured.name}
-              onLoad={() => setImageLoaded(true)}
-              className={`w-24 h-24 object-contain transition-transform group-hover:scale-105 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-              onError={(e) => {
-                if (captured.artwork) {
-                  (e.target as HTMLImageElement).src = captured.artwork;
-                }
-              }}
-            />
+        {/* Clickable body opening modal or link */}
+        {onClick ? (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={onClick}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }}
+            className="flex flex-col items-center my-2 cursor-pointer select-none"
+          >
+            {gridBodyContent}
           </div>
-          <h3 className="capitalize font-bold text-slate-900 dark:text-white text-base">
-            {captured.name}
-          </h3>
-        </Link>
+        ) : (
+          <Link to={`/pokemon/${captured.id}`} className="flex flex-col items-center my-2">
+            {gridBodyContent}
+          </Link>
+        )}
 
         {/* Nickname and Date details */}
         <div className="w-full pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs text-left">
@@ -114,49 +182,29 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
           : 'border-emerald-500/40 dark:border-emerald-500/30'
       }`}
     >
-      <Link
-        to={`/pokemon/${captured.id}`}
-        className="flex items-center space-x-4 flex-1 min-w-0"
-      >
-        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center justify-center p-1 flex-shrink-0 border border-slate-200 dark:border-slate-800">
-          <img
-            src={captured.sprite}
-            alt={captured.name}
-            onLoad={() => setImageLoaded(true)}
-            className={`w-14 h-14 object-contain transition-transform group-hover:scale-110 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            onError={(e) => {
-              if (captured.artwork) {
-                (e.target as HTMLImageElement).src = captured.artwork;
-              }
-            }}
-          />
+      {onClick ? (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={onClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick();
+            }
+          }}
+          className="flex items-center space-x-4 flex-1 min-w-0 cursor-pointer select-none"
+        >
+          {listBodyContent}
         </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center space-x-2">
-            <h3 className="capitalize font-extrabold text-slate-900 dark:text-white text-base sm:text-lg">
-              {captured.name}
-            </h3>
-            <span className="text-xs font-mono font-semibold text-slate-400">
-              {formattedId}
-            </span>
-            {isNew && (
-              <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide rounded-full bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-300 dark:ring-emerald-700 animate-pulse">
-                NEW
-              </span>
-            )}
-          </div>
-          <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-            <span className="font-semibold text-slate-500 dark:text-slate-400">Nickname:</span>{' '}
-            <span className="font-medium text-red-600 dark:text-red-400">{captured.nickname || 'None'}</span>
-          </p>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            <span className="font-semibold">Date:</span> {captured.date}
-          </p>
-        </div>
-      </Link>
+      ) : (
+        <Link
+          to={`/pokemon/${captured.id}`}
+          className="flex items-center space-x-4 flex-1 min-w-0"
+        >
+          {listBodyContent}
+        </Link>
+      )}
 
       <button
         type="button"

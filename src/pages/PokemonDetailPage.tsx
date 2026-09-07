@@ -47,28 +47,33 @@ const StatusSection: React.FC<StatusSectionProps> = ({
 
     setIsSubmitting(true);
 
-    onCapture({
-      id: pokemon.id,
-      name: pokemon.name,
-      nickname: nickname.trim() || pokemon.name,
-      date: date.trim(),
-      sprite: getPokemonSprite(pokemon.id),
-      artwork: getPokemonArtwork(pokemon.id),
-      types: pokemon.types.map((t) => t.type.name),
-      capturedAtTimestamp: Date.now(),
-    });
-
-    showCapturedToast(
-      isCaptured
-        ? `Updated captured info for ${pokemon.name}!`
-        : `Successfully captured ${pokemon.name}!`
-    );
-
-    // After showing toast alert, wait 2.2 seconds loading, then redirect to captured list displaying "NEW"
+    // 1. Loading for 2 seconds
     setTimeout(() => {
+      onCapture({
+        id: pokemon.id,
+        name: pokemon.name,
+        nickname: nickname.trim() || pokemon.name,
+        date: date.trim(),
+        sprite: getPokemonSprite(pokemon.id),
+        artwork: getPokemonArtwork(pokemon.id),
+        types: pokemon.types.map((t) => t.type.name),
+        capturedAtTimestamp: Date.now(),
+      });
+
+      // 2. Show toast alert with green checkmark
+      showCapturedToast(
+        isCaptured
+          ? `Updated captured info for ${pokemon.name}!`
+          : `Successfully captured ${pokemon.name}!`
+      );
+
       setIsSubmitting(false);
-      navigate('/captured', { state: { newlyCapturedId: pokemon.id } });
-    }, 2200);
+
+      // 3. Display toast for 2 seconds, then seamlessly redirect to captured list
+      setTimeout(() => {
+        navigate('/captured', { state: { newlyCapturedId: pokemon.id } });
+      }, 2000);
+    }, 2000);
   };
 
   const handleRelease = () => {
@@ -170,7 +175,7 @@ const StatusSection: React.FC<StatusSectionProps> = ({
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{isCaptured ? 'Updating Details...' : 'Capturing Pokémon...'}</span>
+                <span>{isCaptured ? 'Updating Details...' : 'Capturing Pokémon (2s)...'}</span>
               </>
             ) : (
               <>

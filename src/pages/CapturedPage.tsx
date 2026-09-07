@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { SearchBar } from '../components/common/SearchBar';
 import { ViewToggle } from '../components/common/ViewToggle';
 import { CapturedCard } from '../components/pokemon/CapturedCard';
+import { PokemonModal } from '../components/pokemon/PokemonModal';
 import { useCaptured } from '../hooks/useCaptured';
 import { getStoredViewMode, setStoredViewMode } from '../services/storage';
 import { BookOpen, Sparkles } from 'lucide-react';
@@ -10,6 +11,7 @@ import { BookOpen, Sparkles } from 'lucide-react';
 export const CapturedPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => getStoredViewMode());
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
   const { capturedList, release } = useCaptured();
   const location = useLocation();
 
@@ -70,6 +72,7 @@ export const CapturedPage: React.FC = () => {
               onRelease={release}
               mode={viewMode}
               isNew={captured.id === newlyCapturedId}
+              onClick={() => setSelectedPokemonId(captured.id)}
             />
           ))}
         </div>
@@ -109,6 +112,14 @@ export const CapturedPage: React.FC = () => {
             Clear Filter
           </button>
         </div>
+      )}
+
+      {/* Modal when a captured pokemon is clicked */}
+      {selectedPokemonId !== null && (
+        <PokemonModal
+          pokemonId={selectedPokemonId}
+          onClose={() => setSelectedPokemonId(null)}
+        />
       )}
     </div>
   );

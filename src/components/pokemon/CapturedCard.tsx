@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Calendar, Tag } from 'lucide-react';
 import type { CapturedPokemon } from '../../types/captured';
+import { useToast } from '../../hooks/useToast';
 
 interface CapturedCardProps {
   captured: CapturedPokemon;
@@ -15,14 +16,21 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
   mode = 'list',
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { showConfirmToast, showCapturedToast } = useToast();
   const formattedId = `#${captured.id.toString().padStart(3, '0')}`;
 
   const handleRelease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (window.confirm(`Are you sure you want to release "${captured.nickname || captured.name}"?`)) {
-      onRelease(captured.id);
-    }
+    const targetName = captured.nickname || captured.name;
+    showConfirmToast({
+      message: `Are you sure you want to release ${targetName}?`,
+      confirmLabel: 'Release',
+      onConfirm: () => {
+        onRelease(captured.id);
+        showCapturedToast(`Released ${targetName} from collection.`);
+      },
+    });
   };
 
   if (mode === 'grid') {

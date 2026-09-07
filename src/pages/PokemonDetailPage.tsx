@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Calendar, Tag, Sparkles, Scale, Ruler } from 'lucide-react';
+import { ArrowLeft, Check, Calendar, Tag, Scale, Ruler } from 'lucide-react';
 import { usePokemonDetail } from '../hooks/usePokemonDetail';
 import { useCaptured } from '../hooks/useCaptured';
 import { Badge } from '../components/common/Badge';
 import { getPokemonArtwork, getPokemonSprite } from '../services/api';
+import { useToast } from '../hooks/useToast';
 import type { PokemonDetail } from '../types/pokemon';
 import type { CapturedPokemon } from '../types/captured';
 
@@ -22,7 +23,6 @@ interface StatusSectionProps {
   capturedData?: CapturedPokemon;
   onCapture: (pokemon: CapturedPokemon) => void;
   onRelease: (id: number) => void;
-  onNotify: (msg: string) => void;
 }
 
 const StatusSection: React.FC<StatusSectionProps> = ({
@@ -31,10 +31,10 @@ const StatusSection: React.FC<StatusSectionProps> = ({
   capturedData,
   onCapture,
   onRelease,
-  onNotify,
 }) => {
   const [nickname, setNickname] = useState(capturedData?.nickname || '');
   const [date, setDate] = useState(capturedData?.date || getTodayDateFormatted());
+  const { showCapturedToast, showConfirmToast } = useToast();
 
   const handleCaptureSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,20 +54,25 @@ const StatusSection: React.FC<StatusSectionProps> = ({
       capturedAtTimestamp: Date.now(),
     });
 
-    onNotify(
+    showCapturedToast(
       isCaptured
-        ? `Updated capture details for ${pokemon.name}!`
+        ? `Updated captured info for ${pokemon.name}!`
         : `Successfully captured ${pokemon.name}!`
     );
   };
 
   const handleRelease = () => {
-    if (window.confirm(`Are you sure you want to release ${capturedData?.nickname || pokemon.name}?`)) {
-      onRelease(pokemon.id);
-      setNickname('');
-      setDate(getTodayDateFormatted());
-      onNotify(`Released ${pokemon.name}.`);
-    }
+    const targetName = capturedData?.nickname || pokemon.name;
+    showConfirmToast({
+      message: `Are you sure you want to release ${targetName}?`,
+      confirmLabel: 'Release',
+      onConfirm: () => {
+        onRelease(pokemon.id);
+        setNickname('');
+        setDate(getTodayDateFormatted());
+        showCapturedToast(`Released ${pokemon.name} from collection.`);
+      },
+    });
   };
 
   return (
@@ -176,13 +181,6 @@ export const PokemonDetailPage: React.FC = () => {
   const isCaptured = isPokemonCaptured(numericId);
   const currentCapturedData = getCaptured(numericId);
 
-  const [notification, setNotification] = useState<string | null>(null);
-
-  const showNotification = (msg: string) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3500);
-  };
-
   if (isLoading) {
     return (
       <div className="max-w-xl mx-auto py-12 px-4 text-center space-y-4 animate-pulse">
@@ -216,13 +214,6 @@ export const PokemonDetailPage: React.FC = () => {
 
   return (
     <div className="max-w-xl mx-auto pb-24 space-y-6">
-      {notification && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-2.5 rounded-full shadow-xl text-sm font-semibold flex items-center space-x-2 animate-bounce">
-          <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>{notification}</span>
-        </div>
-      )}
-
       <div className="flex items-center justify-between">
         <button
           type="button"
@@ -269,9 +260,10 @@ export const PokemonDetailPage: React.FC = () => {
           ))}
         </div>
 
+        {/* Details section - displays "Details" with no "<>" */}
         <div className="bg-slate-50 dark:bg-slate-950/60 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 text-left space-y-4">
           <h4 className="text-xs uppercase font-extrabold tracking-wider text-slate-400 dark:text-slate-500 text-center">
-            &lt;Pokemon Details&gt;
+            Details
           </h4>
 
           <div className="grid grid-cols-2 gap-3 text-center">
@@ -361,7 +353,6 @@ export const PokemonDetailPage: React.FC = () => {
           capturedData={currentCapturedData}
           onCapture={capture}
           onRelease={release}
-          onNotify={showNotification}
         />
       </div>
     </div>

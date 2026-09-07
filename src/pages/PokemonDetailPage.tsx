@@ -262,13 +262,13 @@ export const PokemonDetailPage: React.FC = () => {
         )}
       </div>
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm text-center">
-        <div className="relative w-48 h-48 mx-auto my-2 flex items-center justify-center">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm text-center">
+        <div className="relative w-32 h-32 sm:w-44 sm:h-44 mx-auto my-2 flex items-center justify-center">
           <div className="absolute inset-0 rounded-full bg-gradient-to-b from-slate-100 to-slate-200/50 dark:from-slate-800/80 dark:to-slate-800/20" />
           <img
             src={artworkUrl}
             alt={pokemon.name}
-            className="relative z-10 w-44 h-44 object-contain drop-shadow-md transition-transform hover:scale-105 duration-200"
+            className="relative z-10 w-28 h-28 sm:w-40 sm:h-40 object-contain drop-shadow-md transition-transform hover:scale-105 duration-200"
             onError={(e) => {
               (e.target as HTMLImageElement).src = spriteUrl;
             }}

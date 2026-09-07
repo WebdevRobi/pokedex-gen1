@@ -6,7 +6,8 @@ import { CapturedCard } from '../components/pokemon/CapturedCard';
 import { PokemonModal } from '../components/pokemon/PokemonModal';
 import { useCaptured } from '../hooks/useCaptured';
 import { getStoredViewMode, setStoredViewMode } from '../services/storage';
-import { BookOpen, Sparkles } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
+import { PokeballIcon } from '../components/common/PokeballIcon';
 
 export const CapturedPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => getStoredViewMode());
@@ -75,7 +76,7 @@ export const CapturedPage: React.FC = () => {
       {capturedList.length === 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-sm">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-950/60 border border-red-200 dark:border-red-900 flex items-center justify-center text-red-500">
-            <Sparkles className="w-10 h-10" />
+            <PokeballIcon className="w-10 h-10" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">No Captured Pokémon Yet</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-2 mb-6">

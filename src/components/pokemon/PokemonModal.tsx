@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Check, Calendar, Tag, Scale, Ruler, Loader2 } from 'lucide-react';
 import { usePokemonDetail } from '../../hooks/usePokemonDetail';
@@ -72,11 +72,13 @@ const ModalStatusForm: React.FC<ModalStatusFormProps> = ({
         : `Successfully captured ${pokemon.name}!`
     );
 
-    // Show toast, show loading 3 seconds, then return/redirect to captured list
+    // Show toast, show loading for 3 seconds, then smoothly close and redirect to captured list
     setTimeout(() => {
       setIsSubmitting(false);
       onClose();
-      navigate('/captured', { state: { newlyCapturedId: pokemon.id } });
+      setTimeout(() => {
+        navigate('/captured', { state: { newlyCapturedId: pokemon.id } });
+      }, 260);
     }, 3000);
   };
 
@@ -205,24 +207,41 @@ const ModalStatusForm: React.FC<ModalStatusFormProps> = ({
 };
 
 export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }) => {
+  const [isVisible, setIsVisible] = useState(false);
   const { data: pokemon, isLoading, isError, error } = usePokemonDetail(pokemonId);
   const { isPokemonCaptured, getCaptured, capture, release } = useCaptured();
 
   const isCaptured = isPokemonCaptured(pokemonId);
   const currentCapturedData = getCaptured(pokemonId);
 
-  // Lock body scroll while modal is open
+  // Smooth entrance transition on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 15);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Smooth exit transition
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 250);
+  }, [onClose]);
+
+  // Lock body scroll while modal is open & handle Esc key
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose]);
+  }, [handleClose]);
 
   const formattedId = `#${pokemonId.toString().padStart(3, '0')}`;
   const artworkUrl = getPokemonArtwork(pokemonId);
@@ -230,18 +249,26 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto transition-opacity duration-250 ease-out ${
+        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          onClose();
+          handleClose();
         }
       }}
     >
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+      <div
+        className={`relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center transform transition-all duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isVisible
+            ? 'opacity-100 scale-100 translate-y-0'
+            : 'opacity-0 scale-95 translate-y-3'
+        }`}
+      >
         {/* Close button */}
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           aria-label="Close modal"
         >
@@ -263,7 +290,7 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
             <p className="text-sm text-slate-500">{error?.message}</p>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-semibold"
             >
               Close
@@ -387,7 +414,7 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
               capturedData={currentCapturedData}
               onCapture={capture}
               onRelease={release}
-              onClose={onClose}
+              onClose={handleClose}
             />
           </>
         )}

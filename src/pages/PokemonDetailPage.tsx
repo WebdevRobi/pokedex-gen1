@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Calendar, Tag, Scale, Ruler } from 'lucide-react';
+import { ArrowLeft, Check, Calendar, Tag, Scale, Ruler, Loader2 } from 'lucide-react';
 import { usePokemonDetail } from '../hooks/usePokemonDetail';
 import { useCaptured } from '../hooks/useCaptured';
 import { Badge } from '../components/common/Badge';
@@ -34,7 +34,9 @@ const StatusSection: React.FC<StatusSectionProps> = ({
 }) => {
   const [nickname, setNickname] = useState(capturedData?.nickname || '');
   const [date, setDate] = useState(capturedData?.date || getTodayDateFormatted());
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { showCapturedToast, showConfirmToast } = useToast();
+  const navigate = useNavigate();
 
   const handleCaptureSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +44,8 @@ const StatusSection: React.FC<StatusSectionProps> = ({
       alert('Please enter or select a capture date.');
       return;
     }
+
+    setIsSubmitting(true);
 
     onCapture({
       id: pokemon.id,
@@ -59,6 +63,12 @@ const StatusSection: React.FC<StatusSectionProps> = ({
         ? `Updated captured info for ${pokemon.name}!`
         : `Successfully captured ${pokemon.name}!`
     );
+
+    // After showing toast alert, wait 2.2 seconds loading, then redirect to captured list displaying "NEW"
+    setTimeout(() => {
+      setIsSubmitting(false);
+      navigate('/captured', { state: { newlyCapturedId: pokemon.id } });
+    }, 2200);
   };
 
   const handleRelease = () => {
@@ -105,8 +115,9 @@ const StatusSection: React.FC<StatusSectionProps> = ({
               type="text"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              disabled={isSubmitting}
               placeholder={`e.g. Capt, Sparky, ${pokemon.name}`}
-              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-75"
             />
           </div>
         </div>
@@ -122,7 +133,8 @@ const StatusSection: React.FC<StatusSectionProps> = ({
             <button
               type="button"
               onClick={() => setDate(getTodayDateFormatted())}
-              className="text-xs text-red-600 dark:text-red-400 hover:underline font-semibold"
+              disabled={isSubmitting}
+              className="text-xs text-red-600 dark:text-red-400 hover:underline font-semibold disabled:opacity-50"
             >
               Set to Today
             </button>
@@ -136,7 +148,8 @@ const StatusSection: React.FC<StatusSectionProps> = ({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+              disabled={isSubmitting}
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition-all disabled:opacity-75"
               required
             />
           </div>
@@ -145,17 +158,29 @@ const StatusSection: React.FC<StatusSectionProps> = ({
         <div className="pt-2 flex flex-col sm:flex-row gap-3">
           <button
             type="submit"
+            disabled={isSubmitting}
             className={`flex-1 py-3 px-6 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center space-x-2 ${
-              isCaptured
+              isSubmitting
+                ? 'bg-emerald-600 text-white cursor-wait opacity-90'
+                : isCaptured
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
                 : 'bg-red-600 hover:bg-red-700 text-white shadow-red-600/20'
             }`}
           >
-            <Check className="w-4 h-4 stroke-[3]" />
-            <span>{isCaptured ? 'Update Captured Info' : 'Tag as Captured'}</span>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{isCaptured ? 'Updating Details...' : 'Capturing Pokémon...'}</span>
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 stroke-[3]" />
+                <span>{isCaptured ? 'Update Captured Info' : 'Tag as Captured'}</span>
+              </>
+            )}
           </button>
 
-          {isCaptured && (
+          {isCaptured && !isSubmitting && (
             <button
               type="button"
               onClick={handleRelease}
@@ -260,7 +285,7 @@ export const PokemonDetailPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Details section - displays "Details" with no "<>" */}
+        {/* Details section */}
         <div className="bg-slate-50 dark:bg-slate-950/60 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 text-left space-y-4">
           <h4 className="text-xs uppercase font-extrabold tracking-wider text-slate-400 dark:text-slate-500 text-center">
             Details

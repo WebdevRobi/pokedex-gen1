@@ -8,12 +8,14 @@ interface CapturedCardProps {
   captured: CapturedPokemon;
   onRelease: (id: number) => void;
   mode?: 'grid' | 'list';
+  isNew?: boolean;
 }
 
 export const CapturedCard: React.FC<CapturedCardProps> = ({
   captured,
   onRelease,
   mode = 'list',
+  isNew = false,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const { showConfirmToast, showCapturedToast } = useToast();
@@ -35,12 +37,25 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
 
   if (mode === 'grid') {
     return (
-      <div className="group relative bg-white dark:bg-slate-900 rounded-2xl p-4 border border-emerald-500/40 dark:border-emerald-500/30 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-        {/* Header with Release Button */}
+      <div
+        className={`group relative bg-white dark:bg-slate-900 rounded-2xl p-4 border shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${
+          isNew
+            ? 'border-emerald-500 ring-2 ring-emerald-400/80 dark:ring-emerald-500/60'
+            : 'border-emerald-500/40 dark:border-emerald-500/30'
+        }`}
+      >
+        {/* Header with Release Button and NEW badge */}
         <div className="flex items-center justify-between w-full">
-          <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
-            {formattedId}
-          </span>
+          <div className="flex items-center space-x-1.5">
+            <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
+              {formattedId}
+            </span>
+            {isNew && (
+              <span className="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide rounded-full bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-300 dark:ring-emerald-700 animate-pulse">
+                NEW
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={handleRelease}
@@ -92,7 +107,13 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
   }
 
   return (
-    <div className="group bg-white dark:bg-slate-900 border border-emerald-500/40 dark:border-emerald-500/30 rounded-xl p-3 sm:p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+    <div
+      className={`group bg-white dark:bg-slate-900 border rounded-xl p-3 sm:p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all ${
+        isNew
+          ? 'border-emerald-500 ring-2 ring-emerald-400/80 dark:ring-emerald-500/60'
+          : 'border-emerald-500/40 dark:border-emerald-500/30'
+      }`}
+    >
       <Link
         to={`/pokemon/${captured.id}`}
         className="flex items-center space-x-4 flex-1 min-w-0"
@@ -121,6 +142,11 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
             <span className="text-xs font-mono font-semibold text-slate-400">
               {formattedId}
             </span>
+            {isNew && (
+              <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide rounded-full bg-emerald-500 text-white shadow-sm ring-2 ring-emerald-300 dark:ring-emerald-700 animate-pulse">
+                NEW
+              </span>
+            )}
           </div>
           <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
             <span className="font-semibold text-slate-500 dark:text-slate-400">Nickname:</span>{' '}

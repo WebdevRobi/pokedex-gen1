@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { SearchBar } from '../components/common/SearchBar';
 import { ViewToggle } from '../components/common/ViewToggle';
 import { CapturedCard } from '../components/pokemon/CapturedCard';
@@ -11,6 +11,9 @@ export const CapturedPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => getStoredViewMode());
   const [searchQuery, setSearchQuery] = useState<string>('');
   const { capturedList, release } = useCaptured();
+  const location = useLocation();
+
+  const newlyCapturedId = (location.state as { newlyCapturedId?: number } | null)?.newlyCapturedId;
 
   const handleViewModeChange = (mode: 'grid' | 'list') => {
     setViewMode(mode);
@@ -66,6 +69,7 @@ export const CapturedPage: React.FC = () => {
               captured={captured}
               onRelease={release}
               mode={viewMode}
+              isNew={captured.id === newlyCapturedId}
             />
           ))}
         </div>

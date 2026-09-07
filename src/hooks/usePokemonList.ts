@@ -5,14 +5,14 @@ import { fetchPokemonList, fetchAllGen1Pokemon, GEN1_TOTAL } from '../services/a
 export function usePokemonList(limit: number = 24) {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Pre-fetch all 151 Gen 1 Pokemon for instant, zero-latency client-side searching
+
   const allGen1Query = useQuery({
     queryKey: ['allGen1Pokemon'],
     queryFn: fetchAllGen1Pokemon,
     staleTime: 1000 * 60 * 60,
   });
 
-  // Infinite query using limit and offset
+  
   const infiniteQuery = useInfiniteQuery({
     queryKey: ['pokemonListInfinite', limit],
     queryFn: async ({ pageParam }) => {

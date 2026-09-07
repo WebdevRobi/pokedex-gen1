@@ -72,8 +72,9 @@ A high-performance, responsive **Generation 1 Pokédex** web application built w
 
 ### Installation
 ```bash
-# 1. Clone repository or open project folder
-cd /path/to/EXAM
+# 1. Clone repository
+git clone https://github.com/WebdevRobi/pokedex-gen1.git
+cd pokedex-gen1
 
 # 2. Install dependencies
 npm install

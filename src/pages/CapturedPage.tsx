@@ -33,7 +33,6 @@ export const CapturedPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Top Toolbar: Search + View Toggle */}
       <div className="flex items-center gap-3">
         <SearchBar
           value={searchQuery}
@@ -42,8 +41,6 @@ export const CapturedPage: React.FC = () => {
         />
         <ViewToggle mode={viewMode} onChange={handleViewModeChange} />
       </div>
-
-      {/* Header Info */}
       <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 dark:text-slate-400 px-1">
         <span>
           Captured Pokémon:{' '}
@@ -55,8 +52,6 @@ export const CapturedPage: React.FC = () => {
           </span>
         )}
       </div>
-
-      {/* Captured Items */}
       {filteredCaptured.length > 0 && (
         <div
           className={
@@ -77,8 +72,6 @@ export const CapturedPage: React.FC = () => {
           ))}
         </div>
       )}
-
-      {/* Empty State: No captured Pokemon yet */}
       {capturedList.length === 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center shadow-sm">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-950/60 border border-red-200 dark:border-red-900 flex items-center justify-center text-red-500">
@@ -97,8 +90,6 @@ export const CapturedPage: React.FC = () => {
           </Link>
         </div>
       )}
-
-      {/* Filter has no match */}
       {capturedList.length > 0 && filteredCaptured.length === 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center">
           <p className="text-slate-600 dark:text-slate-400">
@@ -113,8 +104,6 @@ export const CapturedPage: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* Modal when a captured pokemon is clicked */}
       {selectedPokemonId !== null && (
         <PokemonModal
           pokemonId={selectedPokemonId}

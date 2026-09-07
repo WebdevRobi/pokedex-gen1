@@ -38,7 +38,6 @@ export const PokedexPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* Top Toolbar: Search + Grid/List View Toggle */}
       <div className="flex items-center gap-3">
         <SearchBar
           value={searchQuery}
@@ -47,8 +46,6 @@ export const PokedexPage: React.FC = () => {
         />
         <ViewToggle mode={viewMode} onChange={handleViewModeChange} />
       </div>
-
-      {/* Results Header Info */}
       <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 dark:text-slate-400 px-1">
         <span>
           {searchQuery ? (
@@ -63,8 +60,6 @@ export const PokedexPage: React.FC = () => {
           )}
         </span>
       </div>
-
-      {/* Error state */}
       {isError && (
         <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-2xl p-6 text-center text-red-700 dark:text-red-400">
           <AlertCircle className="w-8 h-8 mx-auto mb-2 text-red-500" />
@@ -81,8 +76,6 @@ export const PokedexPage: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* Initial Loading Skeletons */}
       {isLoading && (
         <div
           className={
@@ -96,8 +89,6 @@ export const PokedexPage: React.FC = () => {
           ))}
         </div>
       )}
-
-      {/* Pokemon Items */}
       {!isLoading && pokemonList.length > 0 && (
         <div
           className={
@@ -125,8 +116,6 @@ export const PokedexPage: React.FC = () => {
           )}
         </div>
       )}
-
-      {/* Empty Search State */}
       {!isLoading && pokemonList.length === 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl">
@@ -145,8 +134,6 @@ export const PokedexPage: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* "Load More" Button */}
       {!searchQuery && hasMore && !isLoading && (
         <div className="pt-4 flex flex-col items-center">
           <button
@@ -169,8 +156,6 @@ export const PokedexPage: React.FC = () => {
           </span>
         </div>
       )}
-
-      {/* Modal to view details and capture pokemon */}
       {selectedPokemonId !== null && (
         <PokemonModal
           pokemonId={selectedPokemonId}

@@ -63,7 +63,6 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           >
             {toast.type === 'captured' && (
               <div className="flex items-center space-x-3 px-4 py-3 bg-white dark:bg-slate-100 text-slate-900 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-300">
-                {/* Check round green with animated spring-pop */}
                 <div className="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 animate-check-pop shadow-md shadow-emerald-500/30 ring-4 ring-emerald-500/20">
                   <Check className="w-4 h-4 stroke-[3.5]" />
                 </div>

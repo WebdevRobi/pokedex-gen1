@@ -2,7 +2,7 @@ export interface CapturedPokemon {
   id: number;
   name: string;
   nickname: string;
-  date: string; // MM/DD/YYYY or YYYY-MM-DD
+  date: string;
   sprite: string;
   artwork?: string;
   types?: string[];

@@ -46,8 +46,6 @@ const StatusSection: React.FC<StatusSectionProps> = ({
     }
 
     setIsSubmitting(true);
-
-    // 1. Loading for 2 seconds
     setTimeout(() => {
       onCapture({
         id: pokemon.id,
@@ -59,8 +57,6 @@ const StatusSection: React.FC<StatusSectionProps> = ({
         types: pokemon.types.map((t) => t.type.name),
         capturedAtTimestamp: Date.now(),
       });
-
-      // 2. Show toast alert with green checkmark
       showCapturedToast(
         isCaptured
           ? `Updated captured info for ${pokemon.name}!`
@@ -68,8 +64,6 @@ const StatusSection: React.FC<StatusSectionProps> = ({
       );
 
       setIsSubmitting(false);
-
-      // 3. Display toast for 2 seconds, then seamlessly redirect to captured list
       setTimeout(() => {
         navigate('/captured', { state: { newlyCapturedId: pokemon.id } });
       }, 2000);
@@ -289,8 +283,6 @@ export const PokemonDetailPage: React.FC = () => {
             <Badge key={t.slot} type={t.type.name} size="md" />
           ))}
         </div>
-
-        {/* Details section */}
         <div className="bg-slate-50 dark:bg-slate-950/60 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 text-left space-y-4">
           <h4 className="text-xs uppercase font-extrabold tracking-wider text-slate-400 dark:text-slate-500 text-center">
             Details

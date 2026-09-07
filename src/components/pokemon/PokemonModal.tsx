@@ -55,8 +55,6 @@ const ModalStatusForm: React.FC<ModalStatusFormProps> = ({
     }
 
     setIsSubmitting(true);
-
-    // 1. Loading for 2 seconds
     setTimeout(() => {
       onCapture({
         id: pokemon.id,
@@ -68,8 +66,6 @@ const ModalStatusForm: React.FC<ModalStatusFormProps> = ({
         types: pokemon.types.map((t) => t.type.name),
         capturedAtTimestamp: Date.now(),
       });
-
-      // 2. Show toast alert with animated round green checkmark
       showCapturedToast(
         isCaptured
           ? `Updated captured info for ${pokemon.name}!`
@@ -77,8 +73,6 @@ const ModalStatusForm: React.FC<ModalStatusFormProps> = ({
       );
 
       setIsSubmitting(false);
-
-      // 3. Show toast alert for 2 seconds, then smoothly close modal and navigate to captured list
       setTimeout(() => {
         onClose();
         setTimeout(() => {
@@ -219,24 +213,18 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
 
   const isCaptured = isPokemonCaptured(pokemonId);
   const currentCapturedData = getCaptured(pokemonId);
-
-  // Smooth entrance transition on mount
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 15);
     return () => clearTimeout(timer);
   }, []);
-
-  // Smooth exit transition
   const handleClose = useCallback(() => {
     setIsVisible(false);
     setTimeout(() => {
       onClose();
     }, 250);
   }, [onClose]);
-
-  // Lock body scroll while modal is open & handle Esc key
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -271,7 +259,6 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
             : 'opacity-0 scale-95 translate-y-3'
         }`}
       >
-        {/* Close button */}
         <button
           type="button"
           onClick={handleClose}
@@ -306,7 +293,6 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
 
         {pokemon && (
           <>
-            {/* Header with ID and Captured badge */}
             <div className="flex items-center justify-between mb-0.5 sm:mb-1 pr-8">
               <span className="font-mono text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500">
                 {formattedId}
@@ -318,8 +304,6 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
                 </span>
               )}
             </div>
-
-            {/* Photo - responsive size on mobile */}
             <div className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto my-1 sm:my-2 flex items-center justify-center">
               <div className="absolute inset-0 rounded-full bg-gradient-to-b from-slate-100 to-slate-200/50 dark:from-slate-800/80 dark:to-slate-800/20" />
               <img
@@ -331,20 +315,14 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
                 }}
               />
             </div>
-
-            {/* Name */}
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black capitalize tracking-tight text-slate-900 dark:text-white mt-0.5">
               {pokemon.name}
             </h2>
-
-            {/* Types */}
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-1.5 mb-3 sm:mb-4">
               {pokemon.types.map((t) => (
                 <Badge key={t.slot} type={t.type.name} size="sm" />
               ))}
             </div>
-
-            {/* Details section */}
             <div className="bg-slate-50 dark:bg-slate-950/60 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-slate-200/80 dark:border-slate-800 text-left space-y-2.5 sm:space-y-3">
               <h4 className="text-[10px] sm:text-xs uppercase font-extrabold tracking-wider text-slate-400 dark:text-slate-500 text-center">
                 Details
@@ -408,11 +386,7 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
                 </div>
               </div>
             </div>
-
-            {/* Dashed Separator */}
             <div className="border-t border-dashed border-slate-200 dark:border-slate-800 my-3.5 sm:my-4" />
-
-            {/* Status Section Form */}
             <ModalStatusForm
               key={`${pokemon.id}-${isCaptured ? 'captured' : 'new'}`}
               pokemon={pokemon}

@@ -112,7 +112,6 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
             : 'border-emerald-500/40 dark:border-emerald-500/30'
         }`}
       >
-        {/* Header with Release Button and NEW badge */}
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center space-x-1.5">
             <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
@@ -135,7 +134,6 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
           </button>
         </div>
 
-        {/* Clickable body opening modal or link */}
         {onClick ? (
           <div
             role="button"
@@ -157,7 +155,6 @@ export const CapturedCard: React.FC<CapturedCardProps> = ({
           </Link>
         )}
 
-        {/* Nickname and Date details */}
         <div className="w-full pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 text-xs text-left">
           <div className="flex items-center text-slate-700 dark:text-slate-300">
             <Tag className="w-3.5 h-3.5 mr-1 text-slate-400 flex-shrink-0" />

@@ -10,7 +10,6 @@ export const Header: React.FC = () => {
     <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-3 group">
-          {/* Authentic Pokeball icon */}
           <div className="w-9 h-9 rounded-full border-2 border-slate-900 dark:border-white relative overflow-hidden shadow-sm flex flex-col group-hover:rotate-12 transition-transform">
             <div className="bg-red-600 h-1/2 w-full" />
             <div className="bg-white h-1/2 w-full" />

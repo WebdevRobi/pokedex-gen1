@@ -98,19 +98,6 @@ npm run lint
 
 ---
 
-## 📦 Deployment Instructions (Bonus)
-
-### Deploy to Vercel (Recommended)
-1. Push this repository to GitHub.
-2. Go to [Vercel](https://vercel.com) and click **"New Project"**.
-3. Import your GitHub repository.
-4. Framework Preset will be automatically detected as **Vite**.
-5. Click **Deploy**.
-
-*(Single Page Application rewrite rule is supported out-of-the-box by Vite/Vercel).*
-
----
-
 ## 📋 Exam Specifications Checklist
 
 - [x] React TypeScript

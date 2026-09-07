@@ -60,20 +60,20 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           aria-live="polite"
         >
           {toast.type === 'captured' && (
-            <div className="flex items-center space-x-3 px-4 py-3 bg-slate-900/95 dark:bg-slate-800/95 text-white backdrop-blur-md rounded-2xl shadow-2xl border border-slate-700/60 dark:border-slate-700">
+            <div className="flex items-center space-x-3 px-4 py-3 bg-white dark:bg-slate-100 text-slate-900 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-300">
               {/* Check round green with animated spring-pop */}
-              <div className="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 animate-check-pop shadow-md shadow-emerald-500/40 ring-4 ring-emerald-500/20">
+              <div className="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 animate-check-pop shadow-md shadow-emerald-500/30 ring-4 ring-emerald-500/20">
                 <Check className="w-4 h-4 stroke-[3.5]" />
               </div>
 
-              <span className="text-sm font-semibold tracking-tight text-slate-100 pr-1">
+              <span className="text-sm font-bold tracking-tight text-slate-900 pr-1">
                 {toast.message}
               </span>
 
               <button
                 type="button"
                 onClick={hideToast}
-                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors ml-1"
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-200 transition-colors ml-1"
                 aria-label="Close notification"
               >
                 <X className="w-4 h-4" />
@@ -82,12 +82,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           )}
 
           {toast.type === 'confirm' && (
-            <div className="flex flex-col sm:flex-row items-center gap-3 px-4 py-3 bg-slate-900/95 dark:bg-slate-800/95 text-white backdrop-blur-md rounded-2xl shadow-2xl border border-amber-500/40 ring-1 ring-amber-500/20">
+            <div className="flex flex-col sm:flex-row items-center gap-3 px-4 py-3 bg-white dark:bg-slate-100 text-slate-900 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-300">
               <div className="flex items-center space-x-2.5 flex-1 text-left">
-                <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/40">
+                <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 border border-amber-200">
                   <AlertTriangle className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-semibold text-slate-100">
+                <span className="text-sm font-bold text-slate-900">
                   {toast.message}
                 </span>
               </div>
@@ -96,7 +96,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 <button
                   type="button"
                   onClick={hideToast}
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors border border-slate-300"
                 >
                   {toast.cancelLabel}
                 </button>
@@ -107,7 +107,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     hideToast();
                     confirmFn();
                   }}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md shadow-red-600/30 transition-colors"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md shadow-red-600/25 transition-colors"
                 >
                   {toast.confirmLabel}
                 </button>

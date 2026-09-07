@@ -6,21 +6,25 @@ import type { PokemonListItem } from '../../types/pokemon';
 interface PokemonCardGridProps {
   pokemon: PokemonListItem;
   isCaptured: boolean;
+  onClick?: () => void;
 }
 
-export const PokemonCardGrid: React.FC<PokemonCardGridProps> = ({ pokemon, isCaptured }) => {
+export const PokemonCardGrid: React.FC<PokemonCardGridProps> = ({
+  pokemon,
+  isCaptured,
+  onClick,
+}) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const formattedId = `#${pokemon.id.toString().padStart(3, '0')}`;
 
-  return (
-    <Link
-      to={`/pokemon/${pokemon.id}`}
-      className={`group relative bg-white dark:bg-slate-900 rounded-2xl p-4 border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-between text-center ${
-        isCaptured
-          ? 'border-emerald-500/50 dark:border-emerald-500/40 ring-1 ring-emerald-500/20'
-          : 'border-slate-200 dark:border-slate-800 hover:border-red-400 dark:hover:border-red-500'
-      }`}
-    >
+  const cardClasses = `group relative bg-white dark:bg-slate-900 rounded-2xl p-4 border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-between text-center cursor-pointer select-none ${
+    isCaptured
+      ? 'border-emerald-500/50 dark:border-emerald-500/40 ring-1 ring-emerald-500/20'
+      : 'border-slate-200 dark:border-slate-800 hover:border-red-400 dark:hover:border-red-500'
+  }`;
+
+  const cardContent = (
+    <>
       <div className="w-full flex items-center justify-between">
         <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
           {formattedId}
@@ -61,6 +65,31 @@ export const PokemonCardGrid: React.FC<PokemonCardGridProps> = ({ pokemon, isCap
           {pokemon.name}
         </h3>
       </div>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        className={cardClasses}
+      >
+        {cardContent}
+      </div>
+    );
+  }
+
+  return (
+    <Link to={`/pokemon/${pokemon.id}`} className={cardClasses}>
+      {cardContent}
     </Link>
   );
 };

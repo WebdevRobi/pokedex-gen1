@@ -6,21 +6,25 @@ import type { PokemonListItem } from '../../types/pokemon';
 interface PokemonCardListProps {
   pokemon: PokemonListItem;
   isCaptured: boolean;
+  onClick?: () => void;
 }
 
-export const PokemonCardList: React.FC<PokemonCardListProps> = ({ pokemon, isCaptured }) => {
+export const PokemonCardList: React.FC<PokemonCardListProps> = ({
+  pokemon,
+  isCaptured,
+  onClick,
+}) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const formattedId = `#${pokemon.id.toString().padStart(3, '0')}`;
 
-  return (
-    <Link
-      to={`/pokemon/${pokemon.id}`}
-      className={`group bg-white dark:bg-slate-900 border rounded-xl p-3 flex items-center justify-between transition-all hover:shadow-md hover:-translate-x-0.5 ${
-        isCaptured
-          ? 'border-emerald-500/50 dark:border-emerald-500/40 ring-1 ring-emerald-500/20'
-          : 'border-slate-200 dark:border-slate-800 hover:border-red-400 dark:hover:border-red-500'
-      }`}
-    >
+  const rowClasses = `group bg-white dark:bg-slate-900 border rounded-xl p-3 flex items-center justify-between transition-all hover:shadow-md hover:-translate-x-0.5 cursor-pointer select-none ${
+    isCaptured
+      ? 'border-emerald-500/50 dark:border-emerald-500/40 ring-1 ring-emerald-500/20'
+      : 'border-slate-200 dark:border-slate-800 hover:border-red-400 dark:hover:border-red-500'
+  }`;
+
+  const rowContent = (
+    <>
       <div className="flex items-center space-x-4">
         <div className="relative w-14 h-14 bg-slate-100 dark:bg-slate-800/80 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
           <img
@@ -56,6 +60,31 @@ export const PokemonCardList: React.FC<PokemonCardListProps> = ({ pokemon, isCap
         )}
         <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
       </div>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        className={rowClasses}
+      >
+        {rowContent}
+      </div>
+    );
+  }
+
+  return (
+    <Link to={`/pokemon/${pokemon.id}`} className={rowClasses}>
+      {rowContent}
     </Link>
   );
 };

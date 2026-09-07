@@ -3,6 +3,7 @@ import { SearchBar } from '../components/common/SearchBar';
 import { ViewToggle } from '../components/common/ViewToggle';
 import { PokemonCardGrid } from '../components/pokemon/PokemonCardGrid';
 import { PokemonCardList } from '../components/pokemon/PokemonCardList';
+import { PokemonModal } from '../components/pokemon/PokemonModal';
 import { SkeletonCard } from '../components/common/SkeletonCard';
 import { usePokemonList } from '../hooks/usePokemonList';
 import { useCaptured } from '../hooks/useCaptured';
@@ -11,6 +12,8 @@ import { Loader2, AlertCircle } from 'lucide-react';
 
 export const PokedexPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => getStoredViewMode());
+  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
+
   const {
     pokemonList,
     totalGen1,
@@ -109,12 +112,14 @@ export const PokedexPage: React.FC = () => {
                 key={pokemon.id}
                 pokemon={pokemon}
                 isCaptured={isPokemonCaptured(pokemon.id)}
+                onClick={() => setSelectedPokemonId(pokemon.id)}
               />
             ) : (
               <PokemonCardList
                 key={pokemon.id}
                 pokemon={pokemon}
                 isCaptured={isPokemonCaptured(pokemon.id)}
+                onClick={() => setSelectedPokemonId(pokemon.id)}
               />
             )
           )}
@@ -141,7 +146,7 @@ export const PokedexPage: React.FC = () => {
         </div>
       )}
 
-      {/* "Load More" Button (from Wireframe) */}
+      {/* "Load More" Button */}
       {!searchQuery && hasMore && !isLoading && (
         <div className="pt-4 flex flex-col items-center">
           <button
@@ -163,6 +168,14 @@ export const PokedexPage: React.FC = () => {
             {totalGen1 - loadedCount} Pokémon remaining
           </span>
         </div>
+      )}
+
+      {/* Modal to view details and capture pokemon */}
+      {selectedPokemonId !== null && (
+        <PokemonModal
+          pokemonId={selectedPokemonId}
+          onClose={() => setSelectedPokemonId(null)}
+        />
       )}
     </div>
   );

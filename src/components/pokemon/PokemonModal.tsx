@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { X, Check, Calendar, Tag, Scale, Ruler, Loader2 } from 'lucide-react';
 import { usePokemonDetail } from '../../hooks/usePokemonDetail';
@@ -252,9 +253,9 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
   const artworkUrl = getPokemonArtwork(pokemonId);
   const spriteUrl = getPokemonSprite(pokemonId);
 
-  return (
+  const modalContent = (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto overscroll-contain transition-opacity duration-250 ease-out ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto overscroll-contain transition-opacity duration-250 ease-out ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={(e) => {
@@ -352,7 +353,7 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
               <div className="grid grid-cols-2 gap-2 text-center">
                 <div className="bg-white dark:bg-slate-900 p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
                   <div className="flex items-center justify-center space-x-1 text-slate-400 text-[10px] sm:text-xs mb-0.5">
-                    <Ruler className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <Ruler className="w-3.5 h-3.5" />
                     <span>Height</span>
                   </div>
                   <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
@@ -361,7 +362,7 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
                 </div>
                 <div className="bg-white dark:bg-slate-900 p-2 sm:p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
                   <div className="flex items-center justify-center space-x-1 text-slate-400 text-[10px] sm:text-xs mb-0.5">
-                    <Scale className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <Scale className="w-3.5 h-3.5" />
                     <span>Weight</span>
                   </div>
                   <span className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
@@ -426,4 +427,6 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({ pokemonId, onClose }
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };

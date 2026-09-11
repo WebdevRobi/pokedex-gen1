@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { fetchPokemonList, fetchAllGen1Pokemon, GEN1_TOTAL } from '../services/api';
 
@@ -53,6 +53,12 @@ export function usePokemonList(limit: number = 24) {
     });
   }, [searchQuery, paginatedList, allGen1Query.data]);
 
+  const loadMore = useCallback(() => {
+    if (infiniteQuery.hasNextPage && !infiniteQuery.isFetchingNextPage) {
+      infiniteQuery.fetchNextPage();
+    }
+  }, [infiniteQuery]);
+
   return {
     pokemonList: filteredList,
     totalGen1: GEN1_TOTAL,
@@ -63,7 +69,7 @@ export function usePokemonList(limit: number = 24) {
     error: infiniteQuery.error,
     searchQuery,
     setSearchQuery,
-    loadMore: () => infiniteQuery.fetchNextPage(),
+    loadMore,
     hasMore: !!infiniteQuery.hasNextPage,
     refetch: infiniteQuery.refetch,
   };

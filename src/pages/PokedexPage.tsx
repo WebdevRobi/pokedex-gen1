@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SearchBar } from '../components/common/SearchBar';
 import { ViewToggle } from '../components/common/ViewToggle';
 import { PokemonCardGrid } from '../components/pokemon/PokemonCardGrid';
 import { PokemonCardList } from '../components/pokemon/PokemonCardList';
 import { PokemonModal } from '../components/pokemon/PokemonModal';
 import { SkeletonCard } from '../components/common/SkeletonCard';
+import { PokeballIcon } from '../components/common/PokeballIcon';
 import { usePokemonList } from '../hooks/usePokemonList';
 import { useCaptured } from '../hooks/useCaptured';
 import { getStoredViewMode, setStoredViewMode } from '../services/storage';
@@ -35,6 +36,33 @@ export const PokedexPage: React.FC = () => {
     setViewMode(mode);
     setStoredViewMode(mode);
   };
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!hasMore || isFetchingMore || searchQuery) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { rootMargin: '350px' }
+    );
+
+    const el = sentinelRef.current;
+    if (el) {
+      observer.observe(el);
+    }
+
+    return () => {
+      if (el) {
+        observer.unobserve(el);
+      }
+      observer.disconnect();
+    };
+  }, [hasMore, isFetchingMore, searchQuery, loadMore]);
 
   return (
     <div className="space-y-6 pb-20">
@@ -116,6 +144,19 @@ export const PokedexPage: React.FC = () => {
           )}
         </div>
       )}
+      {isFetchingMore && (
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4'
+              : 'flex flex-col space-y-3'
+          }
+        >
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <SkeletonCard key={`fetching-more-${idx}`} mode={viewMode} />
+          ))}
+        </div>
+      )}
       {!isLoading && pokemonList.length === 0 && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-2xl">
@@ -135,24 +176,34 @@ export const PokedexPage: React.FC = () => {
         </div>
       )}
       {!searchQuery && hasMore && !isLoading && (
-        <div className="pt-4 flex flex-col items-center">
-          <button
-            type="button"
-            onClick={loadMore}
-            disabled={isFetchingMore}
-            className="w-full sm:w-auto min-w-[200px] px-8 py-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold rounded-2xl border border-slate-300 dark:border-slate-700 shadow-sm transition-all hover:shadow hover:border-red-400 flex items-center justify-center space-x-2"
-          >
-            {isFetchingMore ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin text-red-500" />
-                <span>Loading more...</span>
-              </>
-            ) : (
-              <span>Load more</span>
-            )}
-          </button>
+        <div ref={sentinelRef} className="pt-4 flex flex-col items-center">
+          {isFetchingMore ? (
+            <div className="flex items-center space-x-2 py-3 text-slate-500 dark:text-slate-400">
+              <Loader2 className="w-5 h-5 animate-spin text-red-500" />
+              <span className="text-sm font-semibold">Loading more Pokémon...</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={loadMore}
+              className="w-full sm:w-auto min-w-[200px] px-8 py-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-2xl border border-slate-300 dark:border-slate-700 shadow-sm transition-all hover:shadow hover:border-red-400 flex items-center justify-center space-x-2"
+            >
+              <span>Load more (or scroll down)</span>
+            </button>
+          )}
           <span className="text-xs text-slate-400 dark:text-slate-500 mt-2">
             {totalGen1 - loadedCount} Pokémon remaining
+          </span>
+        </div>
+      )}
+      {!searchQuery && !hasMore && !isLoading && (
+        <div className="pt-8 pb-4 flex flex-col items-center justify-center text-center space-y-1">
+          <div className="flex items-center space-x-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <PokeballIcon className="w-5 h-5 text-red-500" />
+            <span>All 151 Gen 1 Pokémon loaded!</span>
+          </div>
+          <span className="text-xs text-slate-400 dark:text-slate-500">
+            You have browsed the entire Generation 1 Pokédex.
           </span>
         </div>
       )}

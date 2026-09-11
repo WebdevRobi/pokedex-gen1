@@ -1,18 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { fetchPokemonList, fetchAllGen1Pokemon, GEN1_TOTAL } from '../services/api';
+import { fetchPokemonList, searchPokemonViaApi, GEN1_TOTAL } from '../services/api';
+import { useDebounce } from './useDebounce';
 
 export function usePokemonList(limit: number = 24) {
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const debouncedQuery = useDebounce(searchQuery.trim(), 300);
 
-
-  const allGen1Query = useQuery({
-    queryKey: ['allGen1Pokemon'],
-    queryFn: fetchAllGen1Pokemon,
-    staleTime: 1000 * 60 * 60,
-  });
-
-  
   const infiniteQuery = useInfiniteQuery({
     queryKey: ['pokemonListInfinite', limit],
     queryFn: async ({ pageParam }) => {
@@ -27,31 +21,31 @@ export function usePokemonList(limit: number = 24) {
     staleTime: 1000 * 60 * 30,
   });
 
+  const apiSearchQuery = useQuery({
+    queryKey: ['pokemonApiSearch', debouncedQuery],
+    queryFn: () => searchPokemonViaApi(debouncedQuery),
+    enabled: debouncedQuery.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+
   const paginatedList = useMemo(() => {
     if (!infiniteQuery.data) return [];
     return infiniteQuery.data.pages.flatMap((page) => page.results);
   }, [infiniteQuery.data]);
 
-  const filteredList = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) {
+  const isSearchActive = searchQuery.trim().length > 0;
+  const isSearching =
+    isSearchActive &&
+    (searchQuery.trim() !== debouncedQuery ||
+      apiSearchQuery.isLoading ||
+      apiSearchQuery.isFetching);
+
+  const pokemonList = useMemo(() => {
+    if (!isSearchActive) {
       return paginatedList;
     }
-
-    const sourcePool =
-      allGen1Query.data && allGen1Query.data.length > 0
-        ? allGen1Query.data
-        : paginatedList;
-
-    return sourcePool.filter((pokemon) => {
-      const nameMatch = pokemon.name.toLowerCase().includes(query);
-      const idMatch =
-        pokemon.id.toString() === query ||
-        `#${pokemon.id}` === query ||
-        pokemon.id.toString().padStart(3, '0').includes(query);
-      return nameMatch || idMatch;
-    });
-  }, [searchQuery, paginatedList, allGen1Query.data]);
+    return apiSearchQuery.data || [];
+  }, [isSearchActive, paginatedList, apiSearchQuery.data]);
 
   const loadMore = useCallback(() => {
     if (infiniteQuery.hasNextPage && !infiniteQuery.isFetchingNextPage) {
@@ -60,17 +54,18 @@ export function usePokemonList(limit: number = 24) {
   }, [infiniteQuery]);
 
   return {
-    pokemonList: filteredList,
+    pokemonList,
     totalGen1: GEN1_TOTAL,
     loadedCount: paginatedList.length,
-    isLoading: infiniteQuery.isLoading,
+    isLoading: isSearchActive ? isSearching : infiniteQuery.isLoading,
+    isSearching,
     isFetchingMore: infiniteQuery.isFetchingNextPage,
-    isError: infiniteQuery.isError,
-    error: infiniteQuery.error,
+    isError: isSearchActive ? apiSearchQuery.isError : infiniteQuery.isError,
+    error: isSearchActive ? apiSearchQuery.error : infiniteQuery.error,
     searchQuery,
     setSearchQuery,
     loadMore,
-    hasMore: !!infiniteQuery.hasNextPage,
-    refetch: infiniteQuery.refetch,
+    hasMore: isSearchActive ? false : !!infiniteQuery.hasNextPage,
+    refetch: isSearchActive ? apiSearchQuery.refetch : infiniteQuery.refetch,
   };
 }

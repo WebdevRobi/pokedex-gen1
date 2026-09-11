@@ -20,6 +20,7 @@ export const PokedexPage: React.FC = () => {
     totalGen1,
     loadedCount,
     isLoading,
+    isSearching,
     isFetchingMore,
     isError,
     error,
@@ -71,6 +72,7 @@ export const PokedexPage: React.FC = () => {
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search Gen 1 Pokémon (e.g. Pikachu, #25)..."
+          isLoading={isSearching}
         />
         <ViewToggle mode={viewMode} onChange={handleViewModeChange} />
       </div>

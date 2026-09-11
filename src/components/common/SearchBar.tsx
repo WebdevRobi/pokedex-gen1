@@ -1,16 +1,18 @@
 import React from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Loader2 } from 'lucide-react';
 
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  isLoading?: boolean;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChange,
   placeholder = 'Search Pokémon by name or #id...',
+  isLoading = false,
 }) => {
   return (
     <div className="relative flex-1">
@@ -24,16 +26,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         placeholder={placeholder}
         className="w-full pl-10 pr-10 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl shadow-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
       />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onChange('')}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-          title="Clear search"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      )}
+      <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+        ) : value ? (
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+            title="Clear search"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 };

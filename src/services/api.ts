@@ -89,3 +89,68 @@ export async function fetchPokemonDetail(idOrName: string | number): Promise<Pok
   const response = await apiClient.get<PokemonDetail>(`/pokemon/${idOrName}`);
   return response.data;
 }
+
+export async function searchPokemonViaApi(query: string): Promise<PokemonListItem[]> {
+  const clean = query.trim().toLowerCase().replace(/^#/, '');
+  if (!clean) return [];
+
+  const isNumeric = /^\d+$/.test(clean);
+
+  if (isNumeric) {
+    const id = parseInt(clean, 10);
+    if (id >= 1 && id <= GEN1_TOTAL) {
+      try {
+        const detail = await fetchPokemonDetail(id);
+        return [{
+          id: detail.id,
+          name: detail.name,
+          url: `${API_BASE_URL}/pokemon/${detail.id}/`,
+          sprite: getPokemonSprite(detail.id),
+          artwork: getPokemonArtwork(detail.id),
+        }];
+      } catch {
+        return [];
+      }
+    }
+  }
+
+  try {
+    const direct = await fetchPokemonDetail(clean);
+    if (direct.id <= GEN1_TOTAL) {
+      return [{
+        id: direct.id,
+        name: direct.name,
+        url: `${API_BASE_URL}/pokemon/${direct.id}/`,
+        sprite: getPokemonSprite(direct.id),
+        artwork: getPokemonArtwork(direct.id),
+      }];
+    }
+  } catch {
+  }
+
+  const response = await apiClient.get<PokemonListResponse>(`/pokemon`, {
+    params: {
+      limit: GEN1_TOTAL,
+      offset: 0,
+    },
+  });
+
+  return response.data.results
+    .map((item) => {
+      const id = extractIdFromUrl(item.url);
+      return {
+        id,
+        name: item.name,
+        url: item.url,
+        sprite: getPokemonSprite(id),
+        artwork: getPokemonArtwork(id),
+      };
+    })
+    .filter((pokemon) => {
+      if (pokemon.id > GEN1_TOTAL) return false;
+      const nameMatch = pokemon.name.toLowerCase().includes(clean);
+      const idMatch = pokemon.id.toString() === clean || pokemon.id.toString().padStart(3, '0').includes(clean);
+      return nameMatch || idMatch;
+    });
+}
+
